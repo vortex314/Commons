@@ -1,4 +1,5 @@
 package be.limero.util;
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -6,7 +7,6 @@ package be.limero.util;
  */
 
 import java.util.logging.Logger;
-
 
 /**
  *
@@ -64,6 +64,10 @@ public class Bytes {
 		}
 	}
 
+	public void write(Bytes b) {
+		write(b.bytes());
+	}
+
 	public void write(int b) {
 		write((byte) b);
 	}
@@ -103,6 +107,12 @@ public class Bytes {
 
 	public int used() {
 		return used;
+	}
+
+	public void used(int x) {
+		if (x >= 0 && x <= used) {
+			used = x;
+		}
 	}
 
 	public int capacity() {
@@ -152,7 +162,7 @@ public class Bytes {
 
 			for (int i = used; i >= offset; i--) {
 				data[i + length] = data[i];
-				data[i]=0;
+				data[i] = 0;
 			}
 			used += length;
 		} else
@@ -169,7 +179,7 @@ public class Bytes {
 		}
 		return str.toString();
 	}
-	
+
 	public String toHex() {
 		StringBuilder str = new StringBuilder();
 		for (int i = 0; i < used; i++) {

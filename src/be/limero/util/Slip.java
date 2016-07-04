@@ -28,10 +28,10 @@ public class Slip extends Bytes {
 			escaped = true;
 		} else if (b == ESC_ESC && escaped) {
 			write(ESC);
-			escaped=false;
+			escaped = false;
 		} else if (b == ESC_END && escaped) {
 			write(END);
-			escaped=false;
+			escaped = false;
 		} else {
 			write(b);
 		}
@@ -59,7 +59,7 @@ public class Slip extends Bytes {
 
 	}
 
-	static Bytes decode(Bytes sf) {
+	public static Bytes decode(Bytes sf) {
 		Bytes bytes = new Bytes(sf.length());
 		sf.offset(0);
 		while (sf.hasData()) {
@@ -73,33 +73,42 @@ public class Slip extends Bytes {
 		return bytes;
 	}
 
-	static void addCrc(Bytes bytes) {
+	public static void addCrc(Bytes bytes) {
 		byte[] crc = Fletcher16(bytes);
 		bytes.write(crc[0]);
 		bytes.write(crc[1]);
 	}
+	
+	public static void removeCrc(Bytes bytes){
+		if ( bytes.length()>2) {
+			bytes.used(bytes.used()-2);
+		}
+	}
 
-	static byte[] Fletcher16(Bytes bytes) {
+	public static byte[] Fletcher16(Bytes bytes) {
 		short sum1 = 0;
 		short sum2 = 0;
 		bytes.offset(0);
 		for (int i = 0; i < bytes.length(); i++) {
-			byte b = bytes.read();
+			int b = bytes.read();
+			if (b < 0)
+				b = 256 + b;
 			sum1 = (short) ((sum1 + b) % 255);
 			sum2 = (short) ((sum2 + sum1) % 255);
+//			System.out.printf(" %X : %X , %X \n", b,sum1, sum2);
 		}
 		return new byte[] { (byte) sum2, (byte) sum1 };
 	}
 
 	// _________________________________________________________________________
 
-	static boolean isGoodCrc(Bytes bytes) // PUBLIC
+	public static boolean isGoodCrc(Bytes bytes) // PUBLIC
 	// _________________________________________________________________________
 	{
 		Bytes sub = bytes.sub(0, bytes.length() - 2);
 		byte[] crc = Fletcher16(sub);
-		if (bytes.peek(bytes.length() - 2) == crc[0])
-			if (bytes.peek(bytes.length() - 1) == crc[1])
+		if (bytes.peek(bytes.length() - 2) == crc[1])
+			if (bytes.peek(bytes.length() - 1) == crc[0])
 				return true;
 		return false;
 	}
