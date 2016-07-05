@@ -15,7 +15,8 @@ public class Slip extends Bytes {
 		escaped = false;
 	}
 
-	void reset() {
+	public void reset() {
+		clear();
 		escaped = false;
 	}
 
@@ -37,10 +38,11 @@ public class Slip extends Bytes {
 		}
 		return false;
 	}
+	
 
 	public static Bytes encode(Bytes bytes) {
 		bytes.offset(0);
-		Bytes sf = new Bytes(bytes.length() + 20);
+		Bytes sf = new Bytes(bytes.length() + 100);
 		sf.write(END);
 		while (bytes.hasData()) {
 			byte b = bytes.read();
@@ -73,10 +75,12 @@ public class Slip extends Bytes {
 		return bytes;
 	}
 
-	public static void addCrc(Bytes bytes) {
+	public static Bytes addCrc(Bytes bytes) {
 		byte[] crc = Fletcher16(bytes);
-		bytes.write(crc[0]);
-		bytes.write(crc[1]);
+		Bytes result=new Bytes(bytes.length()+2);
+		result.write(crc[0]);
+		result.write(crc[1]);
+		return result;
 	}
 	
 	public static void removeCrc(Bytes bytes){
