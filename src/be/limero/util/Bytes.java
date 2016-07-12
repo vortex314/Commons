@@ -90,6 +90,10 @@ public class Bytes {
 		return false;
 	}
 
+	public int available() {
+		return used - offset;
+	}
+
 	public boolean hasSpace() {
 		if (used < capacity) {
 			return true;
@@ -199,5 +203,6 @@ public class Bytes {
 		bytes.insert(2, 20);
 		log.info(bytes.toString());
 	}
+
 
 }

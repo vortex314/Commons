@@ -78,6 +78,10 @@ public class Slip extends Bytes {
 	public static Bytes addCrc(Bytes bytes) {
 		byte[] crc = Fletcher16(bytes);
 		Bytes result=new Bytes(bytes.length()+2);
+		bytes.offset(0);
+		while(bytes.hasData()) {
+			result.write(bytes.read());
+		}
 		result.write(crc[0]);
 		result.write(crc[1]);
 		return result;
@@ -111,8 +115,8 @@ public class Slip extends Bytes {
 	{
 		Bytes sub = bytes.sub(0, bytes.length() - 2);
 		byte[] crc = Fletcher16(sub);
-		if (bytes.peek(bytes.length() - 2) == crc[1])
-			if (bytes.peek(bytes.length() - 1) == crc[0])
+		if (bytes.peek(bytes.length() - 2) == crc[0])
+			if (bytes.peek(bytes.length() - 1) == crc[1])
 				return true;
 		return false;
 	}
